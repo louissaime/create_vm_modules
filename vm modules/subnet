@@ -1,1 +1,33 @@
+main.tf
+**********
 
+# Create subnet
+resource "azurerm_subnet" "myterraformsubnet" {
+    count = var.nb_subnets
+    name =  join("-",[var.subnet1,count.index + 1])  
+    resource_group_name  = var.rgname #output of rg
+    virtual_network_name = var.vnetname #output of vnet
+    #address_prefixes =var.address_prefixes
+   address_prefix = element(var.subnets, count.index)   # ["10.0.1.0/24"]
+}
+
+
+
+var.tf
+*********
+variable "subnet1" {}
+variable "rgname" {}
+variable "vnetname" {}
+variable "subnets" {}
+variable "nb_subnets" {}
+
+
+output.tf
+*****************
+output "subnet1_id" {
+  value =azurerm_subnet.myterraformsubnet.0.id
+}
+
+output "subnet2_id" {
+  value =azurerm_subnet.myterraformsubnet.1.id
+}
