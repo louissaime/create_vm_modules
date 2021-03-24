@@ -1,1 +1,42 @@
 
+main.tf
+**************
+# Create network interface
+resource "azurerm_network_interface" "myterraformnic" {
+    name                      =var.name  #"myNIC"
+    location                  =var.location #"West Europe"
+    resource_group_name       =var.rgname # azurerm_resource_group.myterraformgroup.name
+     
+    ip_configuration {
+        name                          =var.name  #"myNicConfiguration"
+        subnet_id                     =var.subnet1_id # azurerm_subnet.myterraformsubnet.id
+        private_ip_address_allocation = var.private_ip_address_allocation #"Dynamic"
+        public_ip_address_id          = var.pip_id
+    }
+
+    tags =var.tags 
+   
+}
+
+
+var.tf
+*******************
+
+
+
+variable "name"{}
+variable "location"{}
+variable "rgname" {
+    description = "output of rg module"
+}
+variable "subnet1_id"{}
+variable "private_ip_address_allocation"{}
+variable "pip_id"{}
+variable "tags"{}
+
+
+output.tf
+*****************
+output "n_interface_ids" {
+  value = azurerm_network_interface.myterraformnic.id
+}
