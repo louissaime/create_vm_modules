@@ -1,1 +1,110 @@
+var.tf
+**************
 
+variable "vmname" {}
+variable "location" {}
+variable "rgname" {}
+variable "n_interface_ids" {}
+variable "size" {}
+variable "disk_name" {}
+variable "caching" {}
+variable "storage_account_type" {}
+variable "publisher" {}
+variable "offer" {}
+variable "sku" {}
+variable "version1" {}
+variable "computer_name" {}
+variable "admin_username" {}
+variable "username" {}
+variable "algorithm" {}
+variable "tags" {}
+variable "nb_vms" {
+  
+}
+
+
+main.tf
+************
+
+# Create (and display) an SSH key
+resource "tls_private_key" "example_ssh" {
+  algorithm =var.algorithm  #"RSA"
+  rsa_bits = 4096
+}
+output "tls_private_key" { value = tls_private_key.example_ssh.private_key_pem }
+
+
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "myterraformvm" {
+    count = var.nb_vms
+    name = join ("-",[var.vmname, count.index +1]) 
+   # name                  =var.vmname     #... "myVM"
+    location              =var.location  #"West Europe"
+    resource_group_name   =var.rgname        # azurerm_resource_group.myterraformgroup.name
+    network_interface_ids =[var.n_interface_ids]  #[azurerm_network_interface.myterraformnic.id]
+    size                  =var.size  #"Standard_DS1_v2"
+
+    os_disk {
+        name              =var.disk_name    #"myOsDisk"
+        caching           =var.caching  #"ReadWrite"
+        storage_account_type =var.storage_account_type #"Premium_LRS"
+    }
+
+    source_image_reference {
+        publisher =var.publisher  # "Canonical"
+        offer     =var.offer  # "UbuntuServer"
+        sku       =var.sku  # "18.04-LTS"
+        version   =var.version1 # "latest"
+    }
+
+    computer_name  =var.computer_name #"myvm"
+    admin_username =var.admin_username  #"azureuser"
+    disable_password_authentication = true
+
+    admin_ssh_key {
+        username       =var.username  #"azureuser"
+        public_key     = tls_private_key.example_ssh.public_key_openssh
+    }
+
+    tags =var.tags
+}
+
+
+
+
+
+# #Second virtual 
+# # Create virtual machine
+# resource "azurerm_linux_virtual_machine" "myterraformvm" {
+#     count = var.nb_vms
+#     name = join ("-",[var.vmname, count.index +1]) 
+#    # name                  =var.vmname     #... "myVM"
+#     location              =var.location  #"West Europe"
+#     resource_group_name   =var.rgname        # azurerm_resource_group.myterraformgroup.name
+#     network_interface_ids =[var.n_interface_ids]  #[azurerm_network_interface.myterraformnic.id]
+#     size                  =var.size  #"Standard_DS1_v2"
+
+#     os_disk {
+#         name              =var.disk_name    #"myOsDisk"
+#         caching           =var.caching  #"ReadWrite"
+#         storage_account_type =var.storage_account_type #"Premium_LRS"
+#     }
+
+#     source_image_reference {
+#         publisher =var.publisher  # "Canonical"
+#         offer     =var.offer  # "UbuntuServer"
+#         sku       =var.sku  # "18.04-LTS"
+#         version   =var.version1 # "latest"
+#     }
+
+#     computer_name  =var.computer_name #"myvm"
+#     admin_username =var.admin_username  #"azureuser"
+#     disable_password_authentication = true
+
+#     admin_ssh_key {
+#         username       =var.username  #"azureuser"
+#         public_key     = tls_private_key.example_ssh.public_key_openssh
+#     }
+
+#     tags =var.tags
+# }
