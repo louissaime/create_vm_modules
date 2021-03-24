@@ -1,1 +1,32 @@
 
+main.tf
+********
+
+# Create public IPs
+resource "azurerm_public_ip" "myterraformpublicip" {
+    name                         = var.name #"myPublicIP"
+    location                     =var.location # "West Europe"
+    resource_group_name          =var.rgname # azurerm_resource_group.myterraformgroup.name
+    allocation_method            = var.allocation_method #"Dynamic"
+    tags= var.tags
+    
+}
+
+
+var.tf
+**********
+variable "name" {}
+variable "location" {}
+variable "rgname" {
+    description = "output of rg module"
+}
+variable "allocation_method" {}
+variable "tags" {}
+
+
+
+out.tf
+*************
+output "pip_id" {
+  value = azurerm_public_ip.myterraformpublicip.id
+}
